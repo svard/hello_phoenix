@@ -1,0 +1,47 @@
+Elm.Phoenix = Elm.Phoenix || {};
+Elm.Phoenix.make = function (_elm) {
+   "use strict";
+   _elm.Phoenix = _elm.Phoenix || {};
+   if (_elm.Phoenix.values) return _elm.Phoenix.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Native$Phoenix = Elm.Native.Phoenix.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var _op = {};
+   var off = $Native$Phoenix.off;
+   var on = $Native$Phoenix.on;
+   var push = $Native$Phoenix.push;
+   var leave = $Native$Phoenix.leave;
+   var join = $Native$Phoenix.join;
+   var channel = $Native$Phoenix.channel;
+   var connect = $Native$Phoenix.connect;
+   var joinChannel = F3(function (socket,topic,address) {    return A2($Task.andThen,A2($Task.andThen,connect(socket),A2(channel,topic,address)),join);});
+   var socket = $Native$Phoenix.socket;
+   var SocketOptions = F4(function (a,b,c,d) {    return {transport: a,heartbeatInterval: b,reconnectAfter: c,longpollerTimeout: d};});
+   var LongPoll = {ctor: "LongPoll"};
+   var WebSocket = {ctor: "WebSocket"};
+   var defaultSocketOptions = {transport: WebSocket,heartbeatInterval: 30000,reconnectAfter: 10000,longpollerTimeout: 20000};
+   var NativeChannel = {ctor: "NativeChannel"};
+   var Channel = F2(function (a,b) {    return {address: a,chan: b};});
+   var Socket = {ctor: "Socket"};
+   return _elm.Phoenix.values = {_op: _op
+                                ,defaultSocketOptions: defaultSocketOptions
+                                ,socket: socket
+                                ,connect: connect
+                                ,channel: channel
+                                ,join: join
+                                ,leave: leave
+                                ,push: push
+                                ,on: on
+                                ,off: off
+                                ,joinChannel: joinChannel
+                                ,Channel: Channel
+                                ,SocketOptions: SocketOptions
+                                ,WebSocket: WebSocket
+                                ,LongPoll: LongPoll};
+};

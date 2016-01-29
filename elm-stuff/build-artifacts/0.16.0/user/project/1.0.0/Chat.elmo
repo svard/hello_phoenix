@@ -1,0 +1,106 @@
+Elm.Chat = Elm.Chat || {};
+Elm.Chat.make = function (_elm) {
+   "use strict";
+   _elm.Chat = _elm.Chat || {};
+   if (_elm.Chat.values) return _elm.Chat.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
+   $Json$Encode = Elm.Json.Encode.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Phoenix = Elm.Phoenix.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $StartApp = Elm.StartApp.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var _op = {};
+   var mailbox = $Signal.mailbox("");
+   var encodeMessage = function (_p0) {
+      var _p1 = _p0;
+      return A2($Json$Encode.encode,0,$Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "body",_1: $Json$Encode.string(_p1.body)}])));
+   };
+   var topic = "rooms:lobby";
+   var channel = function () {
+      var socket = A2($Phoenix.socket,"/socket",$Phoenix.defaultSocketOptions);
+      return A3($Phoenix.joinChannel,socket,topic,mailbox.address);
+   }();
+   var event = "new_msg";
+   var subscribe = Elm.Native.Task.make(_elm).perform(A2($Task.andThen,channel,$Phoenix.on(event)));
+   var is13 = function (code) {    return _U.eq(code,13) ? $Result.Ok({ctor: "_Tuple0"}) : $Result.Err("not the right key code");};
+   var onEnter = F2(function (address,value) {
+      return A3($Html$Events.on,
+      "keydown",
+      A2($Json$Decode.customDecoder,$Html$Events.keyCode,is13),
+      function (_p2) {
+         return A2($Signal.message,address,value);
+      });
+   });
+   var init = {ctor: "_Tuple2",_0: {receivedMsgs: _U.list([]),outgoingMsg: ""},_1: $Effects.none};
+   var messageView = function (_p3) {    var _p4 = _p3;return A2($Html.p,_U.list([]),_U.list([$Html.text(_p4.body)]));};
+   var PushMsg = {ctor: "PushMsg"};
+   var Update = function (a) {    return {ctor: "Update",_0: a};};
+   var view = F2(function (address,model) {
+      return A2($Html.div,
+      _U.list([]),
+      _U.list([A2($Html.input,
+              _U.list([$Html$Attributes.value(model.outgoingMsg)
+                      ,A3($Html$Events.on,"input",$Html$Events.targetValue,function (_p5) {    return A2($Signal.message,address,Update(_p5));})
+                      ,A2(onEnter,address,PushMsg)]),
+              _U.list([]))
+              ,A2($Html.div,_U.list([]),A2($List.map,messageView,$List.reverse(model.receivedMsgs)))]));
+   });
+   var push = function (msg) {
+      return $Effects.task(A2($Task.map,$Basics.always(Update("")),A2($Task.andThen,channel,A2($Phoenix.push,event,encodeMessage(msg)))));
+   };
+   var NewMsg = function (a) {    return {ctor: "NewMsg",_0: a};};
+   var NoOp = {ctor: "NoOp"};
+   var Model = F2(function (a,b) {    return {receivedMsgs: a,outgoingMsg: b};});
+   var Message = function (a) {    return {body: a};};
+   var update = F2(function (action,model) {
+      var _p6 = action;
+      switch (_p6.ctor)
+      {case "NoOp": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
+         case "NewMsg": var _p7 = _p6._0;
+           if (_p7.ctor === "Just") {
+                 return {ctor: "_Tuple2",_0: _U.update(model,{receivedMsgs: A2($List._op["::"],_p7._0,model.receivedMsgs)}),_1: $Effects.none};
+              } else {
+                 return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
+              }
+         case "Update": return {ctor: "_Tuple2",_0: _U.update(model,{outgoingMsg: _p6._0}),_1: $Effects.none};
+         default: return {ctor: "_Tuple2",_0: model,_1: push(Message(model.outgoingMsg))};}
+   });
+   var decodeMessage = $Json$Decode.decodeString(A2($Json$Decode.object1,Message,A2($Json$Decode._op[":="],"body",$Json$Decode.string)));
+   var incoming = A2($Signal.map,function (_p8) {    return NewMsg($Result.toMaybe(decodeMessage(_p8)));},mailbox.signal);
+   var app = $StartApp.start({init: init,update: update,view: view,inputs: _U.list([incoming])});
+   var main = app.html;
+   var tasks = Elm.Native.Task.make(_elm).performSignal("tasks",app.tasks);
+   return _elm.Chat.values = {_op: _op
+                             ,Message: Message
+                             ,Model: Model
+                             ,NoOp: NoOp
+                             ,NewMsg: NewMsg
+                             ,Update: Update
+                             ,PushMsg: PushMsg
+                             ,app: app
+                             ,main: main
+                             ,update: update
+                             ,view: view
+                             ,messageView: messageView
+                             ,init: init
+                             ,onEnter: onEnter
+                             ,is13: is13
+                             ,event: event
+                             ,topic: topic
+                             ,channel: channel
+                             ,push: push
+                             ,decodeMessage: decodeMessage
+                             ,encodeMessage: encodeMessage
+                             ,mailbox: mailbox
+                             ,incoming: incoming};
+};
