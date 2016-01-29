@@ -6,9 +6,12 @@ Based on the [Phoenix framework guide](http://www.phoenixframework.org) app but 
 
 To start your Phoenix app:
 
+  * An existing installation of Elm 0.16 is required
   * Install dependencies with `mix deps.get`
   * Install Node.js dependencies with `npm install`
   * Start Phoenix endpoint with `mix phoenix.server`
+
+Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
 It is required to put
 
@@ -21,8 +24,6 @@ as a dependency in the elm-package.json file to make Elm recognise the elm-phoen
 The Elm client is located in web/static/elm/Chat.elm.
 
 The Elm code is compiled using the elm-brunch plugin. How it is configured can be seen in brunch-config.js.
-
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
 Ready to run in production? Please [check our deployment guides](http://www.phoenixframework.org/docs/deployment).
 
