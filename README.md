@@ -12,7 +12,9 @@ To start your Phoenix app:
 
 It is required to put
 
-  "svard/elm-phoenix": "2.0.0 <= v < 3.0.0"
+```
+"svard/elm-phoenix": "2.0.0 <= v < 3.0.0"
+```
 
 as a dependency in the elm-package.json file to make Elm recognise the elm-phoenix package. But since this package is not yet installable by the Elm installer all Elm dependencies are provided in this repo.
 
